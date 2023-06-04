@@ -26,7 +26,7 @@ router.post("/celebrities/create", (req, res, next) => {
     // .then(res.redirect('/celebrities'))
     mongoose.connect(MONGO_URI)
         // .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
-        .then(Celebrities.create(req.body))
+        .then(()=> Celebrities.create(req.body))
         .then(res.redirect('/celebrities'))
         // .then(()=> mongoose.connection.close()) //somehow it doesn't want to close
         .catch((err) => {
