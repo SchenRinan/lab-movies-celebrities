@@ -7,7 +7,7 @@ const Celebrities = require('../models/Celebrity.model');
 // all your routes here
 router.get("/celebrities", (req, res, next) => {
     mongoose.connect(MONGO_URI)
-        .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
+        // .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
         .then(()=>Celebrities.find())
         .then(content => res.render("celebrities/celebrities", {content}))
         .then(()=> mongoose.connection.close())
@@ -33,4 +33,51 @@ router.post("/celebrities/create", (req, res, next) => {
             console.error("Error connecting to mongo: ", err);
         });
 });
+
+router.get("/celebrities/:id", (req, res, next) => {
+    mongoose.connect(MONGO_URI)
+      // .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
+      .then(()=> Celebrities.findById(req.params.id))
+      .then(item => res.render("celebrities/celebrity-details", item))
+      .then(()=> mongoose.connection.close())
+      .catch((err) => {
+        console.error("Error connecting to mongo: ", err);
+    });
+  });
+
+router.get("/celebrities/:id/edit", (req, res, next) => {
+    mongoose.connect(MONGO_URI)
+        // .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
+        .then(()=>Celebrities.findById(req.params.id))
+        .then(item => res.render("celebrities/edit-celebrity", {item}))
+        .then(()=> mongoose.connection.close())
+        .catch((err) => {
+            console.error("Error connecting to mongo: ", err);
+        });
+});
+
+router.post("/celebrities/:id/edit", (req, res, next) => {
+    mongoose.connect(MONGO_URI)
+      // .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
+      .then(()=> Celebrities.findByIdAndUpdate(req.params.id, req.body))
+      .then(() => {res.redirect("/celebrities")})
+      .then(()=> mongoose.connection.close())
+      .catch((err) => {
+        console.error("Error connecting to mongo: ", err);
+    });
+});
+
+router.post("/celebrities/:id/delete", (req, res, next) => {
+    mongoose.connect(MONGO_URI)
+    //   .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
+      .then(()=>
+        Celebrities.findByIdAndRemove(req.params.id))
+      .then(()=>res.redirect('/celebrities'))
+      // .then(()=> mongoose.connection.close()) //somehow it doesn't want to close
+      // .then(res.redirect('/movies'))
+      .catch((err) => {
+          console.error("Error connecting to mongo: ", err);
+      });
+  });
+
 module.exports = router;
