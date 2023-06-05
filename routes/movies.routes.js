@@ -21,7 +21,7 @@ router.get("/movies/create", (req, res, next) => {
     // .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
     .then(()=> Celebrities.find())
     .then(item => res.render("movies/new-movie", {item}))
-    .then(()=> mongoose.connection.close())
+    // .then(()=> mongoose.connection.close())
     .catch((err) => {
       console.error("Error connecting to mongo: ", err);
   });
@@ -41,8 +41,49 @@ router.post("/movies/create", (req, res, next) => {
 router.get("/movies/:id", (req, res, next) => {
   mongoose.connect(MONGO_URI)
     // .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
-    .then(()=> Movies.findById(req.params.id))
+    .then(()=> Movies.findById(req.params.id).populate('cast'))
     .then(item => res.render("movies/movie-details", item))
+    .then(()=> mongoose.connection.close())
+    .catch((err) => {
+      console.error("Error connecting to mongo: ", err);
+  });
+});
+
+router.post("/movies/:id/delete", (req, res, next) => {
+  mongoose.connect(MONGO_URI)
+    .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
+    .then(()=>
+      Movies.findByIdAndRemove(req.params.id))
+    .then(()=>res.redirect('/movies'))
+    // .then(()=> mongoose.connection.close()) //somehow it doesn't want to close
+    // .then(res.redirect('/movies'))
+    .catch((err) => {
+        console.error("Error connecting to mongo: ", err);
+    });
+});
+
+router.get("/movies/:id/edit", (req, res, next) => {
+  let celeblist;
+  
+  mongoose.connect(MONGO_URI)
+    // .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
+    .then(()=> Celebrities.find())
+    .then((list)=> celeblist = list)
+    .then(()=> Movies.findById(req.params.id).populate('cast'))
+    .then(item => {
+      console.log(item)
+      res.render("movies/edit-movie", {item: item, list: celeblist})})
+    .then(()=> mongoose.connection.close())
+    .catch((err) => {
+      console.error("Error connecting to mongo: ", err);
+  });
+});
+
+router.post("/movies/:id/edit", (req, res, next) => {
+  mongoose.connect(MONGO_URI)
+    // .then((x) => {console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);})
+    .then(()=> Movies.findByIdAndUpdate(req.params.id, req.body))
+    .then(() => {res.redirect("/movies")})
     .then(()=> mongoose.connection.close())
     .catch((err) => {
       console.error("Error connecting to mongo: ", err);

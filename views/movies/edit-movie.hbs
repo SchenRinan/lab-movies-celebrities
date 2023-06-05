@@ -1,0 +1,17 @@
+<form action="/movies/{{item.id}}/edit" method="post">
+    <label for="">Title: </label>
+    <input type="text" name="title" id="" value="{{item.title}}" required>
+    <label for="">Genre: </label>
+    <input type="text" name="genre" id="" value="{{item.genre}}" required>
+    <label for="">Plot: </label>
+    <input type="text" name="plot" id="" value="{{item.plot}}" required>
+    <label for="">Cast:</label>
+    <select name="cast" id="" multiple required>
+    {{#each list}}
+    <option value="{{id}}">{{name}}</option>
+    {{/each}}
+    </select>
+    <p>Hold down the Ctrl (windows) or Command (Mac) button to select multiple options.</p>
+    <br><br>
+    <input type="submit" value="Edit">
+</form>
